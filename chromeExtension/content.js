@@ -29,14 +29,45 @@ console.log('浏览器扩展加载🐒');
         }
         
         timer = setTimeout(() => {
-            addedSpan = document.createElement('span');
-            addedSpan.textContent = 'aaa';
-            addedSpan.style.color = 'red';
-            addedSpan.style.marginLeft = '5px';
-            span.after(addedSpan);
+          fetchContent(span.textContent)
+              .then(content => {
+                  addedSpan = document.createElement('span');
+                  addedSpan.textContent = content;
+                  addedSpan.style.color = 'red';
+                  addedSpan.style.marginLeft = '5px';
+                  span.after(addedSpan);
 
-            document.addEventListener('click', handleOutsideClick);
+                  document.addEventListener('click', handleOutsideClick);
+              })
+              .catch(err => console.error('Error fetching content:', err));
         }, 1500); // 1.5 seconds debounce
+    }
+
+    // Function to fetch content from the API
+  async function fetchContent(spanText) {
+        console.log('请求数据中......', spanText)
+        const response = await fetch('http://localhost:8766/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "你是自动补全助手，根据我发给你的信息，补全后面的部分，不要超过 10 个字。注意只给出后面的话，不要重复之前的话。"
+                    },
+                    {
+                        "role": "user",
+                        "content": `${spanText}`
+                    }
+                ],
+                "model": "gpt-4o"
+            })
+        });
+
+        const data = await response.json();
+        return data.choices[0].message.content;
     }
 
     // Function to monitor DOM for newly added elements with the target class
