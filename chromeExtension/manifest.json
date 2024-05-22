@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Watch Span Text Changes",
+  "version": "0.1",
+  "description": "Watch for changes in text content of span elements with a specific class",
+  "permissions": ["activeTab", "webNavigation"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
